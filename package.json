@@ -13,10 +13,13 @@
   ],
   "scripts": {
     "dev": "nodemon ./src/main.js",
-    "start": "probot run ./index.js",
+    "start": "probot run ./src/index.js",
     "test": "jest"
   },
   "dependencies": {
+    "adm-zip": "^0.5.10",
+    "file-type": "^18.0.0",
+    "fs-extra": "^11.1.0",
     "lodash.pick": "^4.4.0",
     "mongoose": "^6.8.2",
     "probot": "^12.2.4"

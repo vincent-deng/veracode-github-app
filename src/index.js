@@ -10,7 +10,8 @@ module.exports = async (app, { getRouter }) => {
   app.log.info("Yay, the app was loaded!");
 
   app.on('push', handlePush);
-  app.on("workflow_run.completed", handleCompletedRun);
+  app.on("workflow_run.completed", context => {
+    handleCompletedRun(context, { app })});
   app.on("check_run.rerequested", handleReRun);
 
   const router = getRouter(app_route);

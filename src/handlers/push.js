@@ -7,7 +7,6 @@ const repository_dispatch_type = 'veracode-policy-scan'
 const config_path = 'organization-workflows-settings.yml'
 
 async function handlePush(context) {
-  console.log(context.payload);
   // handle branch deletion - will not trigger the process
   if(context.payload.deleted) return;
 

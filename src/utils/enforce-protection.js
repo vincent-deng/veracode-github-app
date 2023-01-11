@@ -18,7 +18,7 @@ async function enforceProtection (octokit, repository, context_name, enforce, en
     console.error(e)
   }
 
-  console.log(protection);
+  // console.log(protection);
   
 }
 
