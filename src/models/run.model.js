@@ -30,6 +30,9 @@ let RunSchema = new mongoose.Schema(
       },
       full_name: {
         type: String
+      },
+      pull_request: {
+        type: Number
       }
     },
     config: {

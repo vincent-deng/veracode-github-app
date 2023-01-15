@@ -46,7 +46,8 @@ async function handlePush(context) {
     repository: {
       owner: context.payload.repository.owner.login,
       name: context.payload.repository.name,
-      full_name: context.payload.repository.full_name
+      full_name: context.payload.repository.full_name,
+      pull_request: -1
     },
     checks: [],
     config: pick(config, config_keys)

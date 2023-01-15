@@ -48,12 +48,17 @@ async function handleCompletedRun(context, { app }) {
     const data = fs.readFileSync(`${destination}/filtered_results.json`)
     const json = JSON.parse(data);
     json.findings.forEach(function(element) {
+      const displayMessage = element.display_text.replace(/\<span\>/g, '').replace(/\<\/span\> /g, '\n').replace(/\<\/span\>/g, '');
+      const message = `Filename: ${element.files.source_file.file}\nLine: ${element.files.source_file.line}\nCWE: ${element.cwe_id} (${element.issue_type})\n\n${displayMessage}
+      `;
       annotations.push({
         path: `src/main/java/${element.files.source_file.file}`,
         start_line: element.files.source_file.line,
         end_line: element.files.source_file.line,
         annotation_level: "warning",
-        message: element.issue_type
+        title: element.issue_type,
+        message: message,
+        // raw_details: 'test',
       });
     })
     fs.rm(destination, { recursive: true });
@@ -82,6 +87,12 @@ async function handleCompletedRun(context, { app }) {
       await context.octokit.checks.update(data);
     }
   }
+
+  const sha = run.sha;
+  const pullRequests = await context.octokit.search.issuesAndPullRequests({
+    q: `repo:${owner}/${run.repository.name} is:pr ${sha}`,
+  });
+  console.log(pullRequests.data);
 }
 
 module.exports = {
