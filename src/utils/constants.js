@@ -1,6 +1,6 @@
 const default_organization_repository = process.env.DEFAULT_ORGANIZATION_REPOSITORY ?? '.github'
 const app_route = process.env.APP_ROUTE ?? '/org-workflows'
-const ngrok = 'https://smee.io/LKCH1RACfocy8f5b'
+const ngrok = 'https://veracode.vincentdeng.net/'
 const config_keys = ['workflows_repository']
 const github_host = process.env.GITHUB_HOST ?? 'https://github.com'
 const artifact_folder = process.env.Artifact_Folder ?? '/Users/vdeng/coding-projects/veracode-github-app-repos/artifacts'
