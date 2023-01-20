@@ -1,7 +1,8 @@
-const pick = require('lodash.pick');
-const { default_organization_repository, app_route, ngrok, config_keys } = require('../utils/constants');
+const { 
+  default_organization_repository, 
+  ngrok 
+} = require('../utils/constants');
 const { shouldRun } = require('../utils/should-run');
-const { Run } = require('../models/run.model');
 
 const repository_dispatch_type = 'veracode-policy-scan'
 const config_path = 'organization-workflows-settings.yml'
@@ -34,7 +35,6 @@ async function handlePush(context) {
   }
 
   const sha = context.payload.after
-  const webhook = await context.octokit.apps.getWebhookConfigForApp()
   const token = await context.octokit.apps.createInstallationAccessToken({
     installation_id: context?.payload?.installation?.id || 0,
     repository_ids: [context.payload.repository.id]
@@ -42,26 +42,19 @@ async function handlePush(context) {
 
   const data = {
     sha,
-    callback_url: `${ngrok}${app_route}/register`,
+    callback_url: `${ngrok}/register`,
     repository: {
       owner: context.payload.repository.owner.login,
       name: context.payload.repository.name,
       full_name: context.payload.repository.full_name,
-      pull_request: -1
-    },
-    checks: [],
-    config: pick(config, config_keys)
+    }
   }
-
-  const runDoc = new Run(data);
-  const { _id } = await runDoc.save();
 
   await context.octokit.repos.createDispatchEvent({
     owner: context.payload.repository.owner.login,
     repo: default_organization_repository,
     event_type: repository_dispatch_type,
     client_payload: {
-      id: _id.toString(),
       token: token.data.token,
       ...data,
       event: context.payload
