@@ -22,9 +22,6 @@ inputs:
   repositroy_name:
     description: 'repositroy_name of original commit (provided by GitHub app via `github.event.client_payload.repository.name`)'
     required: true
-  repositroy_full_name:
-    description: 'repositroy_full_name of original commit (provided by GitHub app via `github.event.client_payload.repository.full_name`)'
-    required: true
   enforce: 
     description: 'Enforce [required status check](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/enabling-required-status-checks)'
     required: false
@@ -44,7 +41,6 @@ runs:
           -d sha=${{ inputs.sha }} \
           --data-urlencode "repositroy_owner=${{ inputs.repositroy_owner }}" \
           --data-urlencode "repositroy_name=${{ inputs.repositroy_name }}" \
-          --data-urlencode "repositroy_full_name=${{ inputs.repositroy_full_name }}" \
           -d enforce=${{ inputs.enforce }} \
           -d enforce_admin=${{ inputs.enforce_admin }} \
           --data-urlencode "name=${{ env.name || github.workflow }}"

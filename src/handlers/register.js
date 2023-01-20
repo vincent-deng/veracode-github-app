@@ -1,30 +1,39 @@
-const { github_host } = require('../utils/constants')
+const { 
+  github_host, 
+  default_organization_repository 
+} = require('../utils/constants')
 // const { enforceProtection } = require('../utils/enforce-protection');
 
 async function handleRegister (req, res, { app }) {
-  const { id, run_id, name, sha, enforce, enforce_admin, documentation } = req.query
-  console.log(req.query);
-  // const run = await Run.findById(id);
-  // if (!run) return res.sendStatus(404);
-  // if (run.sha !== sha) return res.sendStatus(404); // Although unlikely, make sure that people can't create checks by submitting random IDs (mongoose IDs are not-so-random)
+  const { 
+    run_id, 
+    name, 
+    sha, 
+    enforce, 
+    enforce_admin,
+    repositroy_owner,
+    repositroy_name
+  } = req.query
 
-  // const data = {
-  //   owner: run.repository.owner,
-  //   repo: run.repository.name,
-  //   head_sha: run.sha,
-  //   name: name,
-  //   details_url: `${github_host}/${run.repository.owner}/${run.config.workflows_repository}/actions/runs/${run_id}`,
-  //   status: 'in_progress'
-  // }
+  const data = {
+    owner: repositroy_owner,
+    repo: repositroy_name,
+    head_sha: sha,
+    name: name,
+    details_url: `${github_host}/${repositroy_owner}/${default_organization_repository}/actions/runs/${run_id}`,
+    status: 'in_progress'
+  }
 
-  // let octokit = await app.auth();
-  // const installation = await octokit.apps.getRepoInstallation({
-  //   owner: run.repository.owner, 
-  //   repo: run.repository.name 
-  // })
-  // octokit = await app.auth(installation.data.id)
+  let octokit = await app.auth();
+  const installation = await octokit.apps.getRepoInstallation({
+    owner: repositroy_owner, 
+    repo: repositroy_name
+  })
+  octokit = await app.auth(installation.data.id)
 
-  // const checks_run = await octokit.checks.create(data);
+  const checks_run = await octokit.checks.create(data);
+
+  console.log(checks_run);
 
   // enforceProtection(
   //   octokit,
