@@ -16,10 +16,10 @@ inputs:
   sha: 
     description: 'Sha of original commit (provided by GitHub app via `github.event.client_payload.sha`)'
     required: true
-  repositroy_owner:
+  repository_owner:
     description: 'repositroy_owner of original commit (provided by GitHub app via `github.event.client_payload.repository.owner`)'
     required: true
-  repositroy_name:
+  repository_name:
     description: 'repositroy_name of original commit (provided by GitHub app via `github.event.client_payload.repository.name`)'
     required: true
   enforce: 
@@ -39,8 +39,8 @@ runs:
           -d id=${{ inputs.id }} \
           -d run_id=${{ inputs.run_id }} \
           -d sha=${{ inputs.sha }} \
-          --data-urlencode "repositroy_owner=${{ inputs.repositroy_owner }}" \
-          --data-urlencode "repositroy_name=${{ inputs.repositroy_name }}" \
+          --data-urlencode "repository_owner=${{ inputs.repository_owner }}" \
+          --data-urlencode "repository_name=${{ inputs.repository_name }}" \
           -d enforce=${{ inputs.enforce }} \
           -d enforce_admin=${{ inputs.enforce_admin }} \
           --data-urlencode "name=${{ env.name || github.workflow }}"

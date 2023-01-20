@@ -1,8 +1,9 @@
 const { 
   github_host, 
   default_organization_repository 
-} = require('../utils/constants')
-// const { enforceProtection } = require('../utils/enforce-protection');
+} = require('../utils/constants');
+const mapper = require('../db/dynamo-client');
+const Run = require('../models/run.model');
 
 async function handleRegister (req, res, { app }) {
   const { 
@@ -33,24 +34,19 @@ async function handleRegister (req, res, { app }) {
 
   const checks_run = await octokit.checks.create(data);
 
-  console.log(checks_run);
+  const run = new Run();
+  run.run_id = run_id;
+  run.sha = sha;
+  run.repository_owner = repositroy_owner;
+  run.repository_name = repositroy_name;
+  run.check_run = [checks_run.data.id]
 
-  // enforceProtection(
-  //   octokit,
-  //   { owner: run.repository.owner, repo: run.repository.name },
-  //   data.name,
-  //   enforce === "true",
-  //   run.repository.name !== run.config.workflows_repository &&
-  //     enforce_admin === "true" // Exclude the repository that contains the workflow.
-  // );
-
-  // const checkInfo = {
-  //   name: data.name,
-  //   run_id: Number(run_id),
-  //   checks_run_id: checks_run.data.id,
-  // };
-
-  // await Run.findByIdAndUpdate(id, { $push: { checks: checkInfo } });
+  try {
+    await mapper.put({ item: run });
+  } catch (error) {
+    console.error(error);
+    return response.status(500).json({err: 'DynamoError'})
+  }
 
   return res.sendStatus(200);
 }
