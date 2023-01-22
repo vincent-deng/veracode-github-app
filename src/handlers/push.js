@@ -1,6 +1,6 @@
 const { 
   default_organization_repository, 
-  ngrok 
+  ngrok
 } = require('../utils/constants');
 const { shouldRun } = require('../utils/should-run');
 

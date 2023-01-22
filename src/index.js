@@ -15,4 +15,8 @@ module.exports = async (app, { getRouter }) => {
   router.get('/register', (req, res) => {
     handleRegister(req, res, { app });
   });
+
+  router.get('/', (req, res) => {
+    return res.status(200).send('Hello World');
+  });
 };

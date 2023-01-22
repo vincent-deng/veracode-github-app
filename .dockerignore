@@ -5,7 +5,7 @@
 **/.vscode
 **/npm-debug.log
 **/coverage
-**/.env
+# **/.env
 **/.editorconfig
 **/dist
 **/*.pem
