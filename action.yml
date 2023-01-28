@@ -22,6 +22,9 @@ inputs:
   repository_name:
     description: 'repositroy_name of original commit (provided by GitHub app via `github.event.client_payload.repository.name`)'
     required: true
+  scan_type:
+    description: 'scan_type triggered by the GitHub App (provided by GitHub app via `github.event.client_payload.scan_type`)'
+    required: true
   enforce: 
     description: 'Enforce [required status check](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/enabling-required-status-checks)'
     required: false
@@ -39,6 +42,7 @@ runs:
           -d id=${{ inputs.id }} \
           -d run_id=${{ inputs.run_id }} \
           -d sha=${{ inputs.sha }} \
+          -d scan_type=${{ inputs.scan_type }} \
           --data-urlencode "repository_owner=${{ inputs.repository_owner }}" \
           --data-urlencode "repository_name=${{ inputs.repository_name }}" \
           -d enforce=${{ inputs.enforce }} \

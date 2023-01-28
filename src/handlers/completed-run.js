@@ -16,15 +16,11 @@ async function handleCompletedRun(context, { app }) {
   try {
     run = await mapper.get(Object.assign(new Run(), { run_id: workflow_repo_run_id }))
   } catch (error) {
-    console.log(error)
+    context.log.error(error)
     return response.status(500).json({ error: error })
   }
 
   if (!run) return
-//   if (context.payload.repository.name !== run.config.workflows_repository) return
-
-//   const check = run.checks.find((check) => check.run_id === context.payload.workflow_run.id )
-//   if (!check) return;
 
   const { data: artifacts }  = await context.octokit.actions.listWorkflowRunArtifacts({
     owner: workflow_reopo_owner,

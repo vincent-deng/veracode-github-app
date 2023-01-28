@@ -16,6 +16,8 @@ async function handleRegister (req, res, { app }) {
     repository_name
   } = req.query
 
+  console.log(req.query);
+
   const data = {
     owner: repository_owner,
     repo: repository_name,

@@ -3,13 +3,16 @@ const {
   ngrok
 } = require('../utils/constants');
 const { shouldRun } = require('../utils/should-run');
+const { getRepositoryDispatchType } = require('../services/get-repository-dispatch-type');
 
-const repository_dispatch_type = 'veracode-policy-scan'
+let repository_dispatch_type = 'veracode-policy-scan'
 const config_path = 'organization-workflows-settings.yml'
 
 async function handlePush(context) {
   // handle branch deletion - will not trigger the process
   if(context.payload.deleted) return;
+
+  repository_dispatch_type = await getRepositoryDispatchType(context);
 
   const { config } = await context.octokit.config.get({
     owner: context.payload.repository.owner.login,
@@ -54,6 +57,17 @@ async function handlePush(context) {
     owner: context.payload.repository.owner.login,
     repo: default_organization_repository,
     event_type: repository_dispatch_type,
+    client_payload: {
+      token: token.data.token,
+      ...data,
+      event: context.payload
+    }
+  });
+
+  await context.octokit.repos.createDispatchEvent({
+    owner: context.payload.repository.owner.login,
+    repo: default_organization_repository,
+    event_type: 'veracode-sca-scan',
     client_payload: {
       token: token.data.token,
       ...data,

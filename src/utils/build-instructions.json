@@ -1,0 +1,30 @@
+{
+  "Java": [
+    {
+      "build_tool": "pom.xml",
+      "repository_dispatch_type": "java-maven-pipeline-scan"
+    },
+    {
+      "build_tool": "build.gradle",
+      "repository_dispatch_type": "gradle-pipeline-scan"
+    }
+  ],
+  "JavaScript": [
+    {
+      "build_tool": "NA",
+      "repository_dispatch_type": "source-code-pipeline-scan"
+    }
+  ],
+  "Python": [
+    {
+      "build_tool": "NA",
+      "repository_dispatch_type": "source-code-pipeline-scan"
+    }
+  ],
+  "C#": [
+    {
+      "build_tool": "NA",
+      "repository_dispatch_type": "dot-net-pipeline-scan"
+    }
+  ]
+}
