@@ -39,7 +39,6 @@ runs:
     - run: |
         curl -G \
           "${{ inputs.callback_url }}" \
-          -d id=${{ inputs.id }} \
           -d run_id=${{ inputs.run_id }} \
           -d sha=${{ inputs.sha }} \
           -d scan_type=${{ inputs.scan_type }} \
