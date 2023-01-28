@@ -13,10 +13,9 @@ async function handleRegister (req, res, { app }) {
     enforce, 
     enforce_admin,
     repository_owner,
-    repository_name
+    repository_name,
+    scan_type
   } = req.query
-
-  console.log(req.query);
 
   const data = {
     owner: repository_owner,
@@ -41,7 +40,8 @@ async function handleRegister (req, res, { app }) {
   run.sha = sha;
   run.repository_owner = repository_owner;
   run.repository_name = repository_name;
-  run.check_run = [checks_run.data.id]
+  run.check_run_id = checks_run.data.id;
+  run.check_run_type = scan_type;
 
   try {
     await mapper.put({ item: run });
