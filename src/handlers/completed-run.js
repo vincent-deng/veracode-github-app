@@ -17,7 +17,7 @@ async function handleCompletedRun(context) {
 
   if (!run) return
 
-  if (run.check_run_type === 'veracode-sca-scan')
+  if (run.check_run_type === 'veracode-sca-scan' || run.check_run_type === 'veracode-container-security')
     updateChecksForCompletedSCAScan(run, context);
   else
     updateChecksForCompletedPipelineScan(run, context);
