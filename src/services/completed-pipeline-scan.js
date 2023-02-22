@@ -41,6 +41,7 @@ async function updateChecksForCompletedPipelineScan (run, context) {
       const message = `Filename: ${element.files.source_file.file}\nLine: ${element.files.source_file.line}\nCWE: ${element.cwe_id} (${element.issue_type})\n\n${displayMessage}
       `;
       annotations.push({
+        // TODO: get rid of src/main/java
         path: `src/main/java/${element.files.source_file.file}`,
         start_line: element.files.source_file.line,
         end_line: element.files.source_file.line,

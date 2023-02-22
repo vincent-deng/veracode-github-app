@@ -1,17 +1,17 @@
 const fs = require('fs').promises;
 
-async function getRepositoryDispatchTypeByLanguage(languages, context) {
+async function getRepositoryDispatchTypeByLanguage(languages, context, scanType) {
   const buildInstructionPath = 'src/utils/build-instructions.json';
   const buildInstructions = JSON.parse(await fs.readFile(buildInstructionPath));
 
   for (idx in languages) {
     if (languages[idx] in buildInstructions)
-      return await getJavaCompilationWorkflow(buildInstructions[languages[idx]], context);
+      return await getJavaCompilationWorkflow(buildInstructions[languages[idx]], context, scanType);
   }
   throw new Error('Language and Framework not Enabled for Auto Compilation.');
 }
 
-async function getJavaCompilationWorkflow(buildInstructions, context) {
+async function getJavaCompilationWorkflow(buildInstructions, context, scanType) {
   let countOfBuildInstructionsFound = 0;
   let buildInstructionFound;
 
@@ -32,7 +32,7 @@ async function getJavaCompilationWorkflow(buildInstructions, context) {
   }  
   if (countOfBuildInstructionsFound !== 1)
     throw new Error('Found More than one Compilation in the Repository'); 
-  return buildInstructionFound.repository_dispatch_type;
+  return buildInstructionFound.repository_dispatch_type[scanType];
 } 
 
 module.exports = {
