@@ -55,18 +55,20 @@ async function addDispatchEventsByVeracodeConfig(branch, veracodeConfigJson, con
 
   for (const veracodeScanType of veracodeScanTypes) {
     const runForBranch = shouldRunForBranch(branch, veracodeConfigJson[veracodeScanType]);
+    if (!runForBranch) continue;
+
     const scanType = veracodeScanType.replaceAll(/_/g, '-');
 
     if (event_type === 'push') {
       if (veracodeScanType.includes('sast')) {
-        if (!veracodeConfigJson[veracodeScanType].compile_locally && runForBranch) {
+        if (!veracodeConfigJson[veracodeScanType].compile_locally) {
           const autoCompileDispatchType = await getRepositoryDispatchType(context, veracodeScanType);
           dispatchEvents.push({
             'event_type': scanType, 
             'event_trigger': autoCompileDispatchType, 
             'repository': default_organization_repository
           });
-        } else if (veracodeConfigJson[veracodeScanType].compile_locally && runForBranch) {
+        } else if (veracodeConfigJson[veracodeScanType].compile_locally) {
           dispatchEvents.push({
             'event_type': 'veracode-local-compilation',
             'event_trigger': veracodeConfigJson[veracodeScanType].local_compilation_workflow,
@@ -74,22 +76,18 @@ async function addDispatchEventsByVeracodeConfig(branch, veracodeConfigJson, con
           });
         }
       } else {
-        if (runForBranch) {
-          dispatchEvents.push({
-            'event_type': scanType,
-            'event_trigger': scanType,
-            'repository': default_organization_repository
-          });
-        }
-      }
-    } else if (event_type === 'workflow_run') {
-      if (runForBranch) {
         dispatchEvents.push({
           'event_type': scanType,
-          'event_trigger': `binary-ready-${scanType}`,
+          'event_trigger': scanType,
           'repository': default_organization_repository
         });
       }
+    } else if (event_type === 'workflow_run') {
+      dispatchEvents.push({
+        'event_type': scanType,
+        'event_trigger': `binary-ready-${scanType}`,
+        'repository': default_organization_repository
+      });
     }
   }
 
