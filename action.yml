@@ -16,6 +16,9 @@ inputs:
   sha: 
     description: 'Sha of original commit (provided by GitHub app via `github.event.client_payload.sha`)'
     required: true
+  branch: 
+    description: 'branch of original commit (provided by GitHub app via `github.event.client_payload.branch`)'
+    required: true
   repository_owner:
     description: 'repositroy_owner of original commit (provided by GitHub app via `github.event.client_payload.repository.owner`)'
     required: true
@@ -41,6 +44,7 @@ runs:
           "${{ inputs.callback_url }}" \
           -d run_id=${{ inputs.run_id }} \
           -d sha=${{ inputs.sha }} \
+          -d branch=${{ inputs.branch }} \
           -d scan_type=${{ inputs.scan_type }} \
           --data-urlencode "repository_owner=${{ inputs.repository_owner }}" \
           --data-urlencode "repository_name=${{ inputs.repository_name }}" \

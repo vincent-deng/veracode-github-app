@@ -32,7 +32,7 @@ async function handlePush(app, context) {
       dispatchEvents.push(await getRepositoryDispatchType(context, 'veracode_sast_pipeline_scan'));
     }
     dispatchEvents.push('veracode-sca-scan');
-    dispatchEvents.push('veracode-container-security');
+    dispatchEvents.push('veracode-container-security-scan');
   }
 
   const { config } = await context.octokit.config.get({
@@ -69,6 +69,7 @@ async function handlePush(app, context) {
     default_organization_repository,
     payload: {
       sha,
+      branch,
       callback_url: `${ngrok}/register`,
       repository: {
         owner: context.payload.repository.owner.login,
@@ -78,6 +79,10 @@ async function handlePush(app, context) {
     }
   }
   console.log(dispatchEvents);
+
+  // dispatchEvents = [
+  //   { event_type: 'veracode-build', repository: 'verademo-github-app' }
+  // ]
 
   let requests = dispatchEvents.map(event => createDispatchEvent(event, dispatchEventData));
   await Promise.all(requests);
@@ -159,7 +164,7 @@ async function getVeracodeConfig(context, sha) {
       ref: sha
     });
   } catch (error) {
-    app.log.info('veracode.yml not found');
+    console.log('veracode.yml not found');
   }
 
   return veracodeConfig;

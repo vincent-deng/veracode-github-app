@@ -10,6 +10,7 @@ async function handleRegister (req, res, { app }) {
     run_id, 
     name, 
     sha, 
+    branch,
     enforce, 
     enforce_admin,
     repository_owner,
@@ -42,6 +43,7 @@ async function handleRegister (req, res, { app }) {
   run.repository_name = repository_name;
   run.check_run_id = checks_run.data.id;
   run.check_run_type = scan_type;
+  run.branch = branch;
 
   try {
     await mapper.put({ item: run });

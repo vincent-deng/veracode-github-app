@@ -15,7 +15,8 @@ Object.defineProperties(Run.prototype, {
       repository_owner: { type: 'String' },
       repository_name: { type: 'String' }, 
       check_run_id: { type: 'Number' },
-      check_run_type: { type: 'String' }
+      check_run_type: { type: 'String' },
+      branch: { type: 'String' }
     }
   }
 })
