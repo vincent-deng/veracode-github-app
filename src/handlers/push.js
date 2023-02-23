@@ -50,11 +50,12 @@ const createDispatchEvent = async function (event, dispatchEventData) {
   await context.octokit.repos.createDispatchEvent({
     owner: context.payload.repository.owner.login,
     repo: event.repository,
-    event_type: event.event_type,
+    event_type: event.event_trigger,
     client_payload: {
       token: dispatchEventData.token.data.token,
       ...dispatchEventData.payload,
-      event: context.payload
+      event: context.payload,
+      event_type: event.event_type
     }
   });
 }

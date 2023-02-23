@@ -8,12 +8,28 @@ async function addDispatchEvents(branch, veracodeConfig, context) {
   // as well as the sca and container security scanning process.
   if (veracodeConfig === null) {
     if (branch === context.payload.repository.default_branch) {
-      dispatchEvents.push(await getRepositoryDispatchType(context, 'veracode_sast_policy_scan'));
+      dispatchEvents.push({
+        'event_type': 'veracode-sast-policy-scan',
+        'event_trigger': await getRepositoryDispatchType(context, 'veracode_sast_policy_scan'),
+        'repository': default_organization_repository
+      });
     } else {
-      dispatchEvents.push(await getRepositoryDispatchType(context, 'veracode_sast_pipeline_scan'));
+      dispatchEvents.push({
+        'event_type': 'veracode-sast-pipeline-scan',
+        'event_trigger':await getRepositoryDispatchType(context, 'veracode_sast_pipeline_scan'),
+        'repository': default_organization_repository
+      });
     }
-    dispatchEvents.push('veracode-sca-scan');
-    dispatchEvents.push('veracode-container-security-scan');
+    dispatchEvents.push({
+      'event_type': 'veracode-sca-scan',
+      'event_trigger': 'veracode-sca-scan',
+      'repository': default_organization_repository
+    });
+    dispatchEvents.push({
+      'event_type': 'veracode-container-security-scan',
+      'event_trigger': 'veracode-container-security-scan',
+      'repository': default_organization_repository
+    });
   }
   // if veracode.yml exists and compile_locally is set to true, then the sast
   // steps in the push event will be skipped. Instead, we will wait for the 
@@ -37,24 +53,28 @@ async function addDispatchEventsByVeracodeConfig(branch, veracodeConfigJson, con
 
   for (const veracodeScanType of veracodeScanTypes) {
     const runForBranch = shouldRunForBranch(branch, veracodeConfigJson[veracodeScanType]);
+    const scanType = veracodeScanType.replaceAll(/_/g, '-');
 
     if (veracodeScanType.includes('sast')) {
       if (!veracodeConfigJson[veracodeScanType].compile_locally && runForBranch) {
         const autoCompileDispatchType = await getRepositoryDispatchType(context, veracodeScanType);
         dispatchEvents.push({
-          'event_type': autoCompileDispatchType, 
+          'event_type': scanType, 
+          'event_trigger': autoCompileDispatchType, 
           'repository': default_organization_repository
         });
       } else if (veracodeConfigJson[veracodeScanType].compile_locally && runForBranch) {
         dispatchEvents.push({
-          'event_type': veracodeConfigJson[veracodeScanType].local_compilation_workflow,
+          'event_type': 'veracode-local-compilation',
+          'event_trigger': veracodeConfigJson[veracodeScanType].local_compilation_workflow,
           'repository': context.payload.repository.name
         });
       }
     } else {
       if (runForBranch) {
         dispatchEvents.push({
-          'event_type': veracodeScanType.replaceAll(/_/g, '-'),
+          'event_type': scanType,
+          'event_trigger': scanType,
           'repository': default_organization_repository
         });
       }
