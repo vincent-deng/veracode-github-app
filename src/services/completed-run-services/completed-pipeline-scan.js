@@ -1,6 +1,6 @@
 const fs = require("fs-extra");
 const AdmZip = require("adm-zip");
-const { artifact_folder } = require('../utils/constants');
+const { artifact_folder } = require('../../utils/constants');
 
 async function updateChecksForCompletedPipelineScan (run, context) {
 

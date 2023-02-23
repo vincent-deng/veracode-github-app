@@ -1,5 +1,5 @@
 const { getRepositoryDispatchTypeByLanguage } = require('./detect-languages-frameworks');
-const { default_organization_repository} = require('../utils/constants');
+const { default_organization_repository} = require('../../utils/constants');
 
 async function getRepositoryDispatchType(context, scanType) {
   // TODO: still need central control?

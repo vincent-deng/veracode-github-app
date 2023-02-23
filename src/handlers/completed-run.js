@@ -1,11 +1,10 @@
 const mapper = require('../db/dynamo-client');
 const Run = require('../models/run.model');
-const { updateChecksForCompletedSCAScan } = require('../services/completed-sca-scan');
-const { updateChecksForCompletedPipelineScan } = require('../services/completed-pipeline-scan');
-const { 
-  default_organization_repository, 
-  ngrok
-} = require('../utils/constants');
+const { updateChecksForCompletedSCAScan } = 
+  require('../services/completed-run-services/completed-sca-scan');
+const { updateChecksForCompletedPipelineScan } = 
+  require('../services/completed-run-services/completed-pipeline-scan');
+const { default_organization_repository, ngrok } = require('../utils/constants');
 
 async function handleCompletedRun(app, context) {
   if (!context.payload.workflow_run.id) return;
