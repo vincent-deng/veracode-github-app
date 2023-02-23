@@ -15,7 +15,7 @@ async function handleRegister (req, res, { app }) {
     enforce_admin,
     repository_owner,
     repository_name,
-    scan_type
+    event_type
   } = req.query
 
   const data = {
@@ -42,7 +42,7 @@ async function handleRegister (req, res, { app }) {
   run.repository_owner = repository_owner;
   run.repository_name = repository_name;
   run.check_run_id = checks_run.data.id;
-  run.check_run_type = scan_type;
+  run.check_run_type = event_type;
   run.branch = branch;
 
   try {

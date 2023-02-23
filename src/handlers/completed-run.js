@@ -4,7 +4,8 @@ const { updateChecksForCompletedSCAScan } =
   require('../services/completed-run-services/completed-sca-scan');
 const { updateChecksForCompletedPipelineScan } = 
   require('../services/completed-run-services/completed-pipeline-scan');
-const { default_organization_repository, ngrok } = require('../utils/constants');
+const { handleCompletedCompilation } = 
+  require('../services/completed-run-services/completed-local-compilation');
 
 async function handleCompletedRun(app, context) {
   if (!context.payload.workflow_run.id) return;
@@ -21,40 +22,8 @@ async function handleCompletedRun(app, context) {
 
   if (!run) return
 
-  if (run.check_run_type === 'veracode-build') {
-    const data = {
-      owner: run.repository_owner,
-      repo: run.repository_name,
-      check_run_id: run.check_run_id,
-      status: context.payload.workflow_run?.status,
-      conclusion: context.payload.workflow_run?.conclusion,
-    }
-  
-    await context.octokit.checks.update(data);
-
-    const dispatchEventData = {
-      payload: {
-        sha: run.sha,
-        callback_url: `${ngrok}/register`,
-        run_id: run.run_id,
-        repository: {
-          owner: context.payload.repository.owner.login,
-          name: context.payload.repository.name,
-          full_name: context.payload.repository.full_name,
-        }
-      }
-    }
-
-    await context.octokit.repos.createDispatchEvent({
-      owner: context.payload.repository.owner.login,
-      repo: default_organization_repository,
-      event_type: 'binary-ready-pipeline-scan',
-      client_payload: {
-        ...dispatchEventData.payload,
-        event: context.payload
-      }
-    });
-  }
+  if (run.check_run_type === 'veracode-local-compilation') 
+    handleCompletedCompilation(run, context);
   else if (run.check_run_type === 'veracode-sca-scan' || run.check_run_type === 'veracode-container-security-scan')
     updateChecksForCompletedSCAScan(run, context);
   else

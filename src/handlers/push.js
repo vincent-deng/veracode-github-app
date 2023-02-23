@@ -12,7 +12,7 @@ async function handlePush(app, context) {
   const sha = context.payload.after;
 
   const veracodeConfig = await getVeracodeConfig(context, sha);
-  const dispatchEvents = await addDispatchEvents(branch, veracodeConfig, context);
+  const dispatchEvents = await addDispatchEvents(branch, veracodeConfig, context, 'push');
 
   // TODO: add a configuration file in the default organization repository
   // to specify which repositories should not trigger the process
