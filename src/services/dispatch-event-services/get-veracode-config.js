@@ -9,6 +9,7 @@ async function getVeracodeConfig(context, sha) {
     });
   } catch (error) {
     console.log('veracode.yml not found');
+    return null;
   }
 
   return veracodeConfig;

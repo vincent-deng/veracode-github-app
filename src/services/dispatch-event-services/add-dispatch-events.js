@@ -1,6 +1,7 @@
 const jsyaml = require('js-yaml');
 const { default_organization_repository } = require('../../utils/constants');
 const { shouldRunForBranch } = require('./should-run');
+const { getRepositoryDispatchType } = require('../dispatch-event-services/get-repository-dispatch-type');
 
 async function addDispatchEvents(branch, veracodeConfig, context, event_type) {
   let dispatchEvents = [];
