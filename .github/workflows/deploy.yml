@@ -19,6 +19,7 @@ jobs:
           aws-region: ap-southeast-2
       - name: Build and push Docker image
         run: |
+          aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 240243041622.dkr.ecr.ap-southeast-2.amazonaws.com
           docker build -t veracode-github-app-repo .
           docker tag veracode-github-app-repo:latest 240243041622.dkr.ecr.ap-southeast-2.amazonaws.com/veracode-github-app-repo:latest
           docker push 240243041622.dkr.ecr.ap-southeast-2.amazonaws.com/veracode-github-app-repo:latest
