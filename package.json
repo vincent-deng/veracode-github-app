@@ -13,6 +13,7 @@
   ],
   "scripts": {
     "dev": "NODE_ENV=development nodemon ./src/main.js",
+    "sky": "NODE_ENV=development DYNAMODB_TABLE=veracode-github-app-sky nodemon ./src/main.js",
     "start": "probot run ./src/index.js",
     "test": "jest"
   },

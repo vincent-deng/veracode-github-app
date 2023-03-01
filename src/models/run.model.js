@@ -1,10 +1,11 @@
 const DynamoDbSchema = require('@aws/dynamodb-data-mapper').DynamoDbSchema
 const DynamoDbTable = require("@aws/dynamodb-data-mapper").DynamoDbTable
+const { dynamodb_table } = require('../utils/constants')
 
 class Run {}
 
 Object.defineProperties(Run.prototype, {
-  [DynamoDbTable]: { value: 'veracode-github-app'},
+  [DynamoDbTable]: { value: dynamodb_table },
   [DynamoDbSchema]: {
     value: {
       run_id: {
