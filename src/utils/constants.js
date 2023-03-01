@@ -4,7 +4,7 @@ const app_route = process.env.APP_ROUTE ?? '/org-workflows'
 const ngrok = 'https://5044-202-179-135-199.au.ngrok.io'
 const github_host = process.env.GITHUB_HOST ?? 'https://github.com'
 const artifact_folder = process.env.ARTIFACT_FOLDER ?? '/tmp/veracode'
-const dynamodb_table = process.env.DYNAMODB_TABLE ?? 'veracode-github-app-sky'
+const dynamodb_table = process.env.DYNAMODB_TABLE ?? 'veracode-github-app'
 
 module.exports = {
   default_organization_repository,
