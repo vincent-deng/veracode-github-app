@@ -4,12 +4,12 @@ const { artifact_folder } = require('../../utils/constants');
 
 async function updateChecksForCompletedPipelineScan (run, context) {
 
-  const workflow_reopo_owner = context.payload.repository.owner.login;
+  const workflow_repo_owner = context.payload.repository.owner.login;
   const workflow_repo_name = context.payload.repository.name;
   const workflow_repo_run_id = context.payload.workflow_run.id;
 
   const { data: artifacts }  = await context.octokit.actions.listWorkflowRunArtifacts({
-    owner: workflow_reopo_owner,
+    owner: workflow_repo_owner,
     repo: workflow_repo_name,
     run_id: workflow_repo_run_id
   });
@@ -29,7 +29,7 @@ async function updateChecksForCompletedPipelineScan (run, context) {
       fs.mkdirSync(destination, { recursive: true });
     }
 
-    const artifactData = await context.octokit.request(`GET /repos/${workflow_reopo_owner}/${workflow_repo_name}/actions/artifacts/${artifact.id}/zip`);
+    const artifactData = await context.octokit.request(`GET /repos/${workflow_repo_owner}/${workflow_repo_name}/actions/artifacts/${artifact.id}/zip`);
     await fs.writeFileSync(artifactFilename, Buffer.from(artifactData.data));
     const zip = new AdmZip(artifactFilename);
     zip.extractAllTo(`${destination}`, /*overwrite*/true);
