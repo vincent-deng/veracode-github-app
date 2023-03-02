@@ -5,8 +5,11 @@ const { getVeracodeConfig } = require('../services/dispatch-event-services/get-v
 
 async function handlePush(app, context) {
   // handle branch deletion - will not trigger the process
-  if(context.payload.deleted) return; 
-  app.log.debug('Push event received');
+  if(context.payload.deleted) return;
+  // handle repository archiving - will not trigger the process
+  // although we should not expect to see push event from an archived repository
+  if(context.payload.repository.archived) return;
+  app.log.info('Push event received');
   
   const branch = context.payload.ref.substring(11);
   const sha = context.payload.after;
