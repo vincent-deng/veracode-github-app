@@ -73,10 +73,14 @@ The following explains how to debug locally on MacOS or in Windows WSL2.
 6. Select **_Run and Debug > Launch Probot_** to start a debug session for the Probot app. Some useful first breakpoints are on the webhook routes located in [/src/index.js](https://github.com/vincent-deng/veracode-github-app/blob/main/src/index.js).
 7. Clone your Maven or Gradle based Java repository and start to make some changes to see everything working. The basic development flow you should follow is:
 
-  1. Create a new branch for your Java project.
-  2. Make some changes in the branch, commit and push them.
-  3. In GitHub, create a PR for the changes.
-  4. Repeat steps 2 and 3 over and over.
+   1. Create a new branch for your Java project.
+   2. Make some changes in the branch, commit and push them.
+   3. In GitHub, create a PR for the changes.
+   4. Repeat steps 2 and 3 over and over.
+
+### Debugging Hints
+
+- Set breakpoints at the entry points for the webhooks that are triggered on veracode-github-app. These are located in [/src/index.js](https://github.com/vincent-deng/veracode-github-app/blob/main/src/index.js). Specifically, you should look at adding these against the `push`, `workflow_run.completed` and `register` hooks.
 
 ## Contributing
 
