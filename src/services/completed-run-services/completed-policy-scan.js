@@ -1,11 +1,12 @@
 const { updateChecksForCompletedSastScan } = 
-  require('../checks-service/update-checks-for-sast');
+  require('../checks-service/update-checks-with-artifact');
 
 async function updateChecksForCompletedPolicyScan (run, context) {
   const policyScanConfig = {
     artifactName: 'policy-flaws',
     findingFileName: 'policy_flaws.json',
     resultsUrlFileName: 'results_url.txt',
+    title: 'Veracode Static Analysis',
     getAnnotations: function(json) {
       let annotations = []
       json._embedded.findings.forEach(finding => {

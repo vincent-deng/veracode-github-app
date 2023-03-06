@@ -1,11 +1,12 @@
 const { updateChecksForCompletedSastScan } = 
-  require('../checks-service/update-checks-for-sast');
+  require('../checks-service/update-checks-with-artifact');
 
 async function updateChecksForCompletedPipelineScan (run, context) {
   const pipelineScanConfig = {
     artifactName: 'Veracode Pipeline-Scan Results',
     findingFileName: 'filtered_results.json',
     resultsUrlFileName: null,
+    title: 'Veracode Static Analysis',
     getAnnotations: function(json) {
       let annotations = []
       json.findings.forEach(function(element) {

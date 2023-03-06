@@ -3,7 +3,7 @@ const AdmZip = require("adm-zip");
 const { artifact_folder } = require('../../utils/constants');
 const { updateChecks } = require('./checks');
 
-async function updateChecksForCompletedSastScan(run, context, sastScanConfig) {
+async function updateChecksForCompletedSastScan(run, context, scanConfig) {
   const workflow_reopo_owner = context.payload.repository.owner.login;
   const workflow_repo_name = context.payload.repository.name;
   const workflow_repo_run_id = context.payload.workflow_run.id;
@@ -22,7 +22,7 @@ async function updateChecksForCompletedSastScan(run, context, sastScanConfig) {
   if (retry === 0 && artifactRequest.data.total_count === 0) {
     updateChecks(run, context, {
       annotations: [],
-      title: 'Veracode Static Analysis',
+      title: scanConfig.title,
       summary: 'Failed to fetch results artifacts.'
     });
     return;
@@ -33,7 +33,7 @@ async function updateChecksForCompletedSastScan(run, context, sastScanConfig) {
   let resultsUrl = '';
 
   for (const artifact of artifacts.artifacts) {
-    if (artifact.name !== sastScanConfig.artifactName) {
+    if (artifact.name !== scanConfig.artifactName) {
       continue;
     }
     const timestamp = new Date().toISOString();
@@ -50,17 +50,28 @@ async function updateChecksForCompletedSastScan(run, context, sastScanConfig) {
     const zip = new AdmZip(artifactFilename);
     zip.extractAllTo(`${destination}`, /*overwrite*/true);
 
-    if (sastScanConfig.resultsUrlFileName !== null) {
+    if (scanConfig.resultsUrlFileName !== null) {
       resultsUrl = fs.readFileSync(
-        `${destination}/${sastScanConfig.resultsUrlFileName}`, 
+        `${destination}/${scanConfig.resultsUrlFileName}`, 
         'utf8'
       );
     }
-    const data = fs.readFileSync(`${destination}/${sastScanConfig.findingFileName}`)
-    const json = JSON.parse(data);
-    annotations = sastScanConfig.getAnnotations(json);
+    if (scanConfig.findingFileName !== null) {
+      const data = fs.readFileSync(`${destination}/${scanConfig.findingFileName}`)
+      const json = JSON.parse(data);
+      annotations = scanConfig.getAnnotations(json);
+    }
     fs.rm(destination, { recursive: true });
     fs.rm(artifactFilename);
+  }
+
+  if (annotations.length === 0) {
+    updateChecks(run, context, {
+      annotations: [],
+      title: scanConfig.title,
+      summary: `<pre>${resultsUrl}</pre>`
+    });
+    return;
   }
 
   const maxNumberOfAnnotations = 50;
