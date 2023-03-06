@@ -15,7 +15,7 @@ async function handlePush(app, context) {
   const sha = context.payload.after;
 
   const veracodeConfig = await getVeracodeConfig(context, sha);
-  const dispatchEvents = await addDispatchEvents(branch, veracodeConfig, context, 'push');
+  let dispatchEvents = await addDispatchEvents(branch, veracodeConfig, context, 'push');
 
   // TODO: add a configuration file in the default organization repository
   // to specify which repositories should not trigger the process
@@ -37,6 +37,7 @@ async function handlePush(app, context) {
       sha,
       branch,
       callback_url: `${ngrok}/register`,
+      profile_name: context.payload.repository.name,
       repository: {
         owner: context.payload.repository.owner.login,
         name: context.payload.repository.name,
@@ -44,11 +45,22 @@ async function handlePush(app, context) {
       }
     }
   }
+  dispatchEvents= [{
+    'event_type': 'veracode-sast-policy-scan',
+    'event_trigger': 'java-maven-policy-scan',
+    'repository': default_organization_repository
+  }];  
+  // dispatchEvents= [{
+  //   'event_type': 'veracode-get-policy-flaws',
+  //   'event_trigger': 'veracode-get-policy-flaws',
+  //   'repository': default_organization_repository
+  // }];  
   let requests = dispatchEvents.map(event => createDispatchEvent(event, dispatchEventData));
   await Promise.all(requests);
 }
 
 const createDispatchEvent = async function (event, dispatchEventData) {
+  console.log(event);
   context = dispatchEventData.context;
   await context.octokit.repos.createDispatchEvent({
     owner: context.payload.repository.owner.login,

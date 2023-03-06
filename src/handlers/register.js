@@ -58,6 +58,3 @@ async function handleRegister (req, res, { app }) {
 module.exports = {
   handleRegister,
 }
-
-// vincent
-// qq39geSB6DDyAqRy

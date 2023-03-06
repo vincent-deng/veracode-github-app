@@ -6,6 +6,10 @@ const { updateChecksForCompletedPipelineScan } =
   require('../services/completed-run-services/completed-pipeline-scan');
 const { handleCompletedCompilation } = 
   require('../services/completed-run-services/completed-local-compilation');
+const { 
+  updateChecksForCompletedPolicyScan, 
+  processResultsForFailedCompletedPolicyScan 
+} = require('../services/completed-run-services/completed-policy-scan');
 
 async function handleCompletedRun(app, context) {
   if (!context.payload.workflow_run.id) return;
@@ -22,10 +26,16 @@ async function handleCompletedRun(app, context) {
 
   if (!run) return
 
+  console.log(run);
+
   if (run.check_run_type === 'veracode-local-compilation') 
     handleCompletedCompilation(run, context);
   else if (run.check_run_type === 'veracode-sca-scan' || run.check_run_type === 'veracode-container-security-scan')
     updateChecksForCompletedSCAScan(run, context);
+  else if (run.check_run_type === 'veracode-sast-policy-scan')
+    processResultsForFailedCompletedPolicyScan(run, context);
+  // else if (run.check_run_type === 'veracode-get-policy-flaws')
+  //   processResultsForFailedCompletedPolicyScan(run, context);
   else
     updateChecksForCompletedPipelineScan(run, context);
 
