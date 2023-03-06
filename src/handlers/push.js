@@ -1,7 +1,6 @@
 const { default_organization_repository, ngrok } = require('../utils/constants');
 const { shouldRunForRepository } = require('../services/dispatch-event-services/should-run');
-const { addDispatchEvents } = require('../services/dispatch-event-services/add-dispatch-events');
-const { getVeracodeConfig } = require('../services/dispatch-event-services/get-veracode-config');
+const { dispatchEvents } = require('../services/dispatch-event-services/dispatch');
 
 async function handlePush(app, context) {
   // handle branch deletion - will not trigger the process
@@ -13,9 +12,6 @@ async function handlePush(app, context) {
   
   const branch = context.payload.ref.substring(11);
   const sha = context.payload.after;
-
-  const veracodeConfig = await getVeracodeConfig(context, sha);
-  let dispatchEvents = await addDispatchEvents(branch, veracodeConfig, context, 'push');
 
   // TODO: add a configuration file in the default organization repository
   // to specify which repositories should not trigger the process
@@ -31,11 +27,11 @@ async function handlePush(app, context) {
 
   const dispatchEventData = {
     context,
-    token,
-    default_organization_repository,
+    eventType: 'push',
     payload: {
       sha,
       branch,
+      token: token.data.token,
       callback_url: `${ngrok}/register`,
       profile_name: context.payload.repository.name,
       repository: {
@@ -45,34 +41,8 @@ async function handlePush(app, context) {
       }
     }
   }
-  dispatchEvents= [{
-    'event_type': 'veracode-sast-policy-scan',
-    'event_trigger': 'java-maven-policy-scan',
-    'repository': default_organization_repository
-  }];  
-  // dispatchEvents= [{
-  //   'event_type': 'veracode-get-policy-flaws',
-  //   'event_trigger': 'veracode-get-policy-flaws',
-  //   'repository': default_organization_repository
-  // }];  
-  let requests = dispatchEvents.map(event => createDispatchEvent(event, dispatchEventData));
-  await Promise.all(requests);
-}
 
-const createDispatchEvent = async function (event, dispatchEventData) {
-  console.log(event);
-  context = dispatchEventData.context;
-  await context.octokit.repos.createDispatchEvent({
-    owner: context.payload.repository.owner.login,
-    repo: event.repository,
-    event_type: event.event_trigger,
-    client_payload: {
-      token: dispatchEventData.token.data.token,
-      ...dispatchEventData.payload,
-      event: context.payload,
-      event_type: event.event_type
-    }
-  });
+  await dispatchEvents(dispatchEventData);
 }
 
 module.exports = {

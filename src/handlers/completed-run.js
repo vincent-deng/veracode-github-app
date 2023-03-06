@@ -8,7 +8,6 @@ const { handleCompletedCompilation } =
   require('../services/completed-run-services/completed-local-compilation');
 const { 
   updateChecksForCompletedPolicyScan, 
-  processResultsForFailedCompletedPolicyScan 
 } = require('../services/completed-run-services/completed-policy-scan');
 
 async function handleCompletedRun(app, context) {
@@ -33,9 +32,7 @@ async function handleCompletedRun(app, context) {
   else if (run.check_run_type === 'veracode-sca-scan' || run.check_run_type === 'veracode-container-security-scan')
     updateChecksForCompletedSCAScan(run, context);
   else if (run.check_run_type === 'veracode-sast-policy-scan')
-    processResultsForFailedCompletedPolicyScan(run, context);
-  // else if (run.check_run_type === 'veracode-get-policy-flaws')
-  //   processResultsForFailedCompletedPolicyScan(run, context);
+    updateChecksForCompletedPolicyScan(run, context);
   else
     updateChecksForCompletedPipelineScan(run, context);
 

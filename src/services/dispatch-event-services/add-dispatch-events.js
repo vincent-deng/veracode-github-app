@@ -6,15 +6,6 @@ const { getRepositoryDispatchType } = require('../dispatch-event-services/get-re
 async function addDispatchEvents(branch, veracodeConfig, context, event_type) {
   let dispatchEvents = [];
 
-  if (event_type === 'policy_fail') {
-    dispatchEvents.push({
-      'event_type': 'veracode-get-policy-flaws',
-      'event_trigger': 'veracode-get-policy-flaws',
-      'repository': default_organization_repository
-    });
-    return dispatchEvents;
-  }
-
   // if veracode.yml does not exist, then we will trigger the sast scanning process
   // as well as the sca and container security scanning process.
   if (veracodeConfig === null) {
