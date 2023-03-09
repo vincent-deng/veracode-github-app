@@ -3,7 +3,7 @@ veracode_sast_pipeline_scan:
   # pull request event. Specifying both will only execute push event.
   # Leaving them both false means this will never run
   push:
-    trigger: true
+    trigger: false
     # Please only specify either branches_to_run or branches_to_exclude
     # Entering both will only execute branches_to_run
     # Leaving them both blank means this will never run
@@ -11,12 +11,12 @@ veracode_sast_pipeline_scan:
     branches_to_exclude:
       - default_branch
   pull_request:
-    trigger: true
+    trigger: false
     action:
       - open
       - synchronize
     target_branch:
-      - main
+      - default_branch
   break_build: true
   policy: verademo
   create_issues: false
@@ -32,7 +32,7 @@ veracode_sast_policy_scan:
   # pull request event. Specifying both will only execute push event.
   # Leaving them both false means this will never run
   push:
-    trigger: true
+    trigger: false
     branches_to_run:
       - default_branch
     branches_to_exclude:
@@ -42,7 +42,7 @@ veracode_sast_policy_scan:
       - open
       - synchronize
     target_branch:
-      - main
+      - default_branch
   break_build: true
   policy: verademo
   create_issues: false
@@ -58,7 +58,7 @@ veracode_sca_scan:
   # pull request event. Specifying both will only execute push event.
   # Leaving them both false means this will never run
   push:
-    trigger: true
+    trigger: false
     # Please only specify either branches_to_run or branches_to_exclude
     # Entering both will only execute branches_to_run
     # Leaving them both blank means this will never run
@@ -66,12 +66,12 @@ veracode_sca_scan:
       - "*"
     branches_to_exclude:
   pull_request:
-    trigger: true
+    trigger: false
     action:
       - open
       - synchronize
     target_branch:
-      - main
+      - default_branch
   break_build: true
   create_issues: false
 
@@ -80,7 +80,7 @@ veracode_container_security_scan:
   # pull request event. Specifying both will only execute push event.
   # Leaving them both false means this will never run
   push:
-    trigger: true
+    trigger: false
     # Please only specify either branches_to_run or branches_to_exclude
     # Entering both will only execute branches_to_run
     # Leaving them both blank means this will never run
@@ -88,11 +88,11 @@ veracode_container_security_scan:
       - "*"
     branches_to_exclude:
   pull_request:
-    trigger: true
+    trigger: false
     action:
       - open
       - synchronize
     target_branch:
-      - main
+      - default_branch
   break_build: true
   create_issues: false

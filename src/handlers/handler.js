@@ -4,9 +4,6 @@ const { getDispatchEvents } = require('../services/dispatch-event-services/get-d
 const { createDispatchEvent } = require('../services/dispatch-event-services/dispatch');
 
 async function handleEvents(app, context) {
-  if (context.name === 'pull_request') {
-    return;
-  }
   // handle branch deletion - will not trigger the process
   if(context.payload.deleted) return;
 
@@ -21,9 +18,9 @@ async function handleEvents(app, context) {
   if(!shouldRunForRepository(context.payload.repository.name, excludedRepositories))
     return;
 
-  // TODO: check if this is correct for pull request
-  const branch = context.payload.ref.replace('refs/heads/', ''); 
-  // TODO: check if this is correct for pull request
+  let branch;
+  branch = context.name === 'push' ? 
+    context.payload.ref.replace('refs/heads/', '') : context.payload.pull_request.head.ref;
   const sha = context.payload.after; 
 
   const dispatchEvents = await getDispatchEvents(app, context, branch);
@@ -41,7 +38,7 @@ async function handleEvents(app, context) {
       token: token.data.token,
       callback_url: `${ngrok}/register`,
       // TODO: read veracode.yml to get profile name
-      profile_name: context.payload.repository.name, 
+      profile_name: context.payload.repository.full_name, 
       repository: {
         owner: context.payload.repository.owner.login,
         name: context.payload.repository.name,

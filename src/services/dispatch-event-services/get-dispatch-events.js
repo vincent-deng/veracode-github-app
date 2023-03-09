@@ -11,6 +11,8 @@ async function getDispatchEvents(app, context, branch) {
   const originalRepo = context.payload.repository.name;
   const eventName = context.name;
   const defaultBranch = context.payload.repository.default_branch;
+  const action = context.payload.action ?? 'null';
+  const targetBranch = context.payload.pull_request?.base?.ref ?? null;
 
   let veracodeScanConfigs;
   // 1. get veracode.yml from original repository
@@ -45,7 +47,7 @@ async function getDispatchEvents(app, context, branch) {
   
   for (const scanType of veracodeConfigKeys) {
     app.log.info(scanType);
-    if (!await shouldRunScanType(eventName, branch, defaultBranch, veracodeScanConfigs[scanType]))
+    if (!await shouldRunScanType(eventName, branch, defaultBranch, veracodeScanConfigs[scanType], action, targetBranch))
       continue;
     const scanEventType = scanType.replaceAll(/_/g, '-');
     

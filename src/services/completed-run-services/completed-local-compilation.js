@@ -20,6 +20,8 @@ async function handleCompletedCompilation (run, context) {
       sha: run.sha,
       branch: run.branch,
       callback_url: `${ngrok}/register`,
+      // TODO: read veracode.yml to get profile name
+      profile_name: context.payload.repository.full_name, 
       run_id: run.run_id,
       repository: {
         owner: context.payload.repository.owner.login,
