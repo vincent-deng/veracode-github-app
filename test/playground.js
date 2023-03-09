@@ -22,3 +22,7 @@
 
 // const mystr4 = 'veracode_container_security_scan'
 // console.log(mystr4.replaceAll(/_/g, '-'));
+
+const var1 = 'veracode-local-compilation-scan';
+
+console.log(var1.substring(0,26));

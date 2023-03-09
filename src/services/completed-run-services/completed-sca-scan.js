@@ -2,7 +2,7 @@
 // const AdmZip = require("adm-zip");
 // const { artifact_folder } = require('../../utils/constants');
 const { updateChecksForCompletedSastScan } = 
-  require('../checks-service/update-checks-with-artifact');
+  require('../check-services/update-checks-with-artifact');
 
 async function updateChecksForCompletedSCAScan (run, context) {
   const scaScanConfig = {

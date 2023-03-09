@@ -1,7 +1,8 @@
 const mapper = require('../db/dynamo-client');
 const Run = require('../models/run.model');
-const { updateChecksForCompletedSCAScan } = 
-  require('../services/completed-run-services/completed-sca-scan');
+const { 
+  updateChecksForCompletedSCAScan 
+} = require('../services/completed-run-services/completed-sca-scan');
 const { updateChecksForCompletedPipelineScan } = 
   require('../services/completed-run-services/completed-pipeline-scan');
 const { handleCompletedCompilation } = 
@@ -24,10 +25,9 @@ async function handleCompletedRun(app, context) {
   }
 
   if (!run) return
-
   console.log(run);
 
-  if (run.check_run_type === 'veracode-local-compilation') 
+  if (run.check_run_type.substring(0, 26) === 'veracode-local-compilation') 
     handleCompletedCompilation(run, context);
   else if (run.check_run_type === 'veracode-sca-scan' || run.check_run_type === 'veracode-container-security-scan')
     updateChecksForCompletedSCAScan(run, context);

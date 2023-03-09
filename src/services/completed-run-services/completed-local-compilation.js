@@ -1,6 +1,5 @@
-const { ngrok } = require('../../utils/constants');
-const { addDispatchEvents } = require('../dispatch-event-services/add-dispatch-events');
-const { getVeracodeConfig } = require('../dispatch-event-services/get-veracode-config');
+const { ngrok, default_organization_repository } = require('../../utils/constants');
+const { createDispatchEvent } = require('../dispatch-event-services/dispatch');
 
 async function handleCompletedCompilation (run, context) {
   const data = {
@@ -12,6 +11,8 @@ async function handleCompletedCompilation (run, context) {
   }
 
   await context.octokit.checks.update(data);
+
+  if (data.conclusion === 'failure') return;
 
   const dispatchEventData = {
     context,
@@ -28,27 +29,15 @@ async function handleCompletedCompilation (run, context) {
     }
   }
 
-  const veracodeConfig = await getVeracodeConfig(context, run.sha);
-  const dispatchEvents = await addDispatchEvents(run.branch, veracodeConfig, context, 'workflow_run');
-
-  console.log(dispatchEvents);
+  const subsequentScanType = run.check_run_type.substring(27);
+  const dispatchEvents = [{
+    event_type: subsequentScanType,
+    repository: default_organization_repository,
+    event_trigger: `binary-ready-${subsequentScanType}`
+  }]
 
   let requests = dispatchEvents.map(event => createDispatchEvent(event, dispatchEventData));
   await Promise.all(requests);
-}
-
-const createDispatchEvent = async function (event, dispatchEventData) {
-  context = dispatchEventData.context;
-  await context.octokit.repos.createDispatchEvent({
-    owner: context.payload.repository.owner.login,
-    repo: event.repository,
-    event_type: event.event_trigger,
-    client_payload: {
-      ...dispatchEventData.payload,
-      event: context.payload,
-      event_type: event.event_type
-    }
-  });
 }
 
 module.exports = {

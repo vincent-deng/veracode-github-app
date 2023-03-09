@@ -35,7 +35,31 @@ function shouldRunForBranch(branch, veracodeScanType) {
   return runForBranch;
 }
 
+function shouldRunScanType(eventName, branch, defaultBranch, veracodeScanConfig) {
+  const trigger = veracodeScanConfig.push.trigger ? 
+    'push' : veracodeScanConfig.pull_request.trigger ? 
+    'pull_request' : '';
+  if (eventName !== trigger) return false;
+
+  if (trigger === 'push'){
+    // replace default_branch in the config with the actual default branch
+    let pushScanConfig = veracodeScanConfig.push;
+    const attributes = ['branches_to_run', 'branches_to_exclude'];
+    for (const attribute of attributes) {
+      if (pushScanConfig[attribute] !== null) {
+        for (let index = 0; index < pushScanConfig[attribute].length; index++) {
+          if (pushScanConfig[attribute][index] === 'default_branch') {
+            pushScanConfig[attribute][index] = defaultBranch;
+          }
+        }
+      }
+    }
+    return shouldRunForBranch(branch, pushScanConfig);
+  }
+}
+
 module.exports = {
   shouldRunForRepository,
-  shouldRunForBranch
+  shouldRunForBranch,
+  shouldRunScanType,
 }

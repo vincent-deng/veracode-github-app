@@ -1,5 +1,5 @@
 const { updateChecksForCompletedSastScan } = 
-  require('../checks-service/update-checks-with-artifact');
+  require('../check-services/update-checks-with-artifact');
 
 async function updateChecksForCompletedPipelineScan (run, context) {
   const pipelineScanConfig = {

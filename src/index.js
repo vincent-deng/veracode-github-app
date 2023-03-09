@@ -1,12 +1,17 @@
-const { handlePush } = require('./handlers/push');
 const { handleRegister } = require('./handlers/register');
 const { handleCompletedRun } = require('./handlers/completed-run');
+const { handleEvents } = require('./handlers/handler');
 
 module.exports = async (app, { getRouter }) => {
   app.on(
-    'push', 
-    handlePush.bind(null, app)
+    ["push", "pull_request"], 
+    handleEvents.bind(null, app)
   );
+
+  // app.on(
+  //   'push', 
+  //   handlePush.bind(null, app)
+  // );
 
   app.on(
     'workflow_run.completed', 
