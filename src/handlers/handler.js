@@ -18,8 +18,7 @@ async function handleEvents(app, context) {
   if(!shouldRunForRepository(context.payload.repository.name, excludedRepositories))
     return;
 
-  let branch;
-  branch = context.name === 'push' ? 
+  const branch = context.name === 'push' ? 
     context.payload.ref.replace('refs/heads/', '') : context.payload.pull_request.head.ref;
   const sha = context.payload.after; 
 
