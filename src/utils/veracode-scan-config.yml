@@ -13,7 +13,7 @@ veracode_sast_pipeline_scan:
   pull_request:
     trigger: false
     action:
-      - open
+      - opened
       - synchronize
     target_branch:
       - default_branch
@@ -39,7 +39,7 @@ veracode_sast_policy_scan:
   pull_request:
     trigger: true
     action:
-      - open
+      - opened
       - synchronize
     target_branch:
       - default_branch
@@ -68,7 +68,7 @@ veracode_sca_scan:
   pull_request:
     trigger: false
     action:
-      - open
+      - opened
       - synchronize
     target_branch:
       - default_branch
@@ -90,7 +90,7 @@ veracode_container_security_scan:
   pull_request:
     trigger: false
     action:
-      - open
+      - opened
       - synchronize
     target_branch:
       - default_branch

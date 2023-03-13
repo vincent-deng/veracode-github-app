@@ -1,6 +1,7 @@
 const { handleRegister } = require('./handlers/register');
 const { handleCompletedRun } = require('./handlers/completed-run');
 const { handleEvents } = require('./handlers/handler');
+const handleInstallationRepositories = require('./handlers/installation');
 
 module.exports = async (app, { getRouter }) => {
   app.on(
@@ -8,17 +9,18 @@ module.exports = async (app, { getRouter }) => {
     handleEvents.bind(null, app)
   );
 
-  // app.on(
-  //   'push', 
-  //   handlePush.bind(null, app)
-  // );
-
   app.on(
     'workflow_run.completed', 
     handleCompletedRun.bind(null, app)
   );
-  // app.on("workflow_run.completed", context => {
-  //   handleCompletedRun(context, { app })});
+
+  // app.on([
+  //   "installation",
+  //   "installation_repositories"
+  //   ], 
+  //   handleInstallationRepositories.bind(null, app)
+  // );
+  
   // app.on("check_run.rerequested", handleReRun);
   // app.on('pull_request.opened', async (context) => {
   //   console.log(context);

@@ -1,32 +1,39 @@
 const { shouldRunForRepository } = require('../services/config-services/should-run');
-const { default_organization_repository, ngrok } = require('../utils/constants');
 const { getDispatchEvents } = require('../services/dispatch-event-services/get-dispatch-events');
 const { createDispatchEvent } = require('../services/dispatch-event-services/dispatch');
+const appConfig = require('../app-config');
 
 async function handleEvents(app, context) {
-  // handle branch deletion - will not trigger the process
-  if(context.payload.deleted) return;
+  const { deleted, 
+    repository: { id: repoId, name: repoName, archived, full_name: repoFullName, owner: { login } }, 
+    installation: { id: installationId } 
+  } = context.payload;
 
-  // handle repository archiving - will not trigger the process
-  // although we should not expect to see push event from an archived repository
-  if(context.payload.repository.archived) return;
+  // 1. handle branch deletion - will not trigger the process
+  // 2. handle repository archiving - will not trigger the process
+  //    although we should not expect to see push event from an archived repository
+  if(deleted || archived) return;
 
-  // handle excluded repositories
-  // TODO: add a configuration file in the default organization repository
-  // to specify which repositories should not trigger the process
-  const excludedRepositories = [default_organization_repository];
-  if(!shouldRunForRepository(context.payload.repository.name, excludedRepositories))
+  // 3. handle excluded repositories
+  const excludedRepositories = [appConfig().defaultOrganisationRepository];
+  if(!shouldRunForRepository(repoName, excludedRepositories))
     return;
 
   const branch = context.name === 'push' ? 
     context.payload.ref.replace('refs/heads/', '') : context.payload.pull_request.head.ref;
-  const sha = context.payload.after; 
+
+  // 4. handle veracode yml auto pr branch
+  if (branch === appConfig().prBranch) return;
+
+  const sha = context.name === 'push' ? context.payload.after : context.payload.pull_request.head.sha;
 
   const dispatchEvents = await getDispatchEvents(app, context, branch);
 
-  const token = await context.octokit.apps.createInstallationAccessToken({
-    installation_id: context?.payload?.installation?.id || 0,
-    repository_ids: [context.payload.repository.id]
+  const api = context.octokit;
+
+  const token = await api.apps.createInstallationAccessToken({
+    installation_id: installationId,
+    repository_ids: [repoId]
   })
 
   const dispatchEventData = {
@@ -35,13 +42,13 @@ async function handleEvents(app, context) {
       sha,
       branch,
       token: token.data.token,
-      callback_url: `${ngrok}/register`,
+      callback_url: `${appConfig().appUrl}/register`,
       // TODO: read veracode.yml to get profile name
-      profile_name: context.payload.repository.full_name, 
+      profile_name: repoFullName, 
       repository: {
-        owner: context.payload.repository.owner.login,
-        name: context.payload.repository.name,
-        full_name: context.payload.repository.full_name,
+        owner: login,
+        name: repoName,
+        full_name: repoFullName,
       }
     }
   }

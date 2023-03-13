@@ -24,6 +24,7 @@
     "fs-extra": "^11.1.0",
     "js-yaml": "^4.1.0",
     "lodash.pick": "^4.4.0",
+    "pluralize": "^8.0.0",
     "probot": "^12.2.4"
   },
   "devDependencies": {
