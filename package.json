@@ -1,0 +1,38 @@
+{
+  "name": "veracode-github-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Run Veracode Code Analysis in a central managed workflow.",
+  "author": "Vincent Deng <vsdeng@veracode.com>",
+  "license": "ISC",
+  "homepage": "https://github.com//",
+  "keywords": [
+    "probot",
+    "github",
+    "probot-app"
+  ],
+  "scripts": {
+    "dev": "nodemon ./src/main.js",
+    "start": "probot run ./src/index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.10",
+    "fs-extra": "^11.1.0",
+    "lodash.pick": "^4.4.0",
+    "mongoose": "^6.8.2",
+    "probot": "^12.2.4"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "nock": "^13.0.5",
+    "nodemon": "^2.0.20",
+    "smee-client": "^1.2.2"
+  },
+  "engines": {
+    "node": ">= 10.13.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}
