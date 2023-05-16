@@ -1,47 +1,56 @@
-const { Run } = require('../models/run.model');
-const { github_host } = require('../utils/constants')
-const { enforceProtection } = require('../utils/enforce-protection');
+const { 
+  github_host, 
+  default_organization_repository 
+} = require('../utils/constants');
+const mapper = require('../db/dynamo-client');
+const Run = require('../models/run.model');
 
 async function handleRegister (req, res, { app }) {
-  const { id, run_id, name, sha, enforce, enforce_admin, documentation } = req.query
-  const run = await Run.findById(id);
-  if (!run) return res.sendStatus(404);
-  if (run.sha !== sha) return res.sendStatus(404); // Although unlikely, make sure that people can't create checks by submitting random IDs (mongoose IDs are not-so-random)
+  const { 
+    run_id, 
+    name, 
+    sha, 
+    branch,
+    enforce, 
+    enforce_admin,
+    repository_owner,
+    repository_name,
+    event_type
+  } = req.query
 
   const data = {
-    owner: run.repository.owner,
-    repo: run.repository.name,
-    head_sha: run.sha,
+    owner: repository_owner,
+    repo: repository_name,
+    head_sha: sha,
     name: name,
-    details_url: `${github_host}/${run.repository.owner}/${run.config.workflows_repository}/actions/runs/${run_id}`,
+    details_url: `${github_host}/${repository_owner}/${default_organization_repository}/actions/runs/${run_id}`,
     status: 'in_progress'
   }
 
   let octokit = await app.auth();
   const installation = await octokit.apps.getRepoInstallation({
-    owner: run.repository.owner, 
-    repo: run.repository.name 
+    owner: repository_owner, 
+    repo: repository_name
   })
   octokit = await app.auth(installation.data.id)
 
   const checks_run = await octokit.checks.create(data);
 
-  enforceProtection(
-    octokit,
-    { owner: run.repository.owner, repo: run.repository.name },
-    data.name,
-    enforce === "true",
-    run.repository.name !== run.config.workflows_repository &&
-      enforce_admin === "true" // Exclude the repository that contains the workflow.
-  );
+  const run = new Run();
+  run.run_id = run_id;
+  run.sha = sha;
+  run.repository_owner = repository_owner;
+  run.repository_name = repository_name;
+  run.check_run_id = checks_run.data.id;
+  run.check_run_type = event_type;
+  run.branch = branch;
 
-  const checkInfo = {
-    name: data.name,
-    run_id: Number(run_id),
-    checks_run_id: checks_run.data.id,
-  };
-
-  await Run.findByIdAndUpdate(id, { $push: { checks: checkInfo } });
+  try {
+    await mapper.put({ item: run });
+  } catch (error) {
+    console.error(error);
+    return response.status(500).json({err: 'DynamoError'})
+  }
 
   return res.sendStatus(200);
 }

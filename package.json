@@ -12,15 +12,19 @@
     "probot-app"
   ],
   "scripts": {
-    "dev": "nodemon ./src/main.js",
+    "dev": "NODE_ENV=development nodemon ./src/main.js",
+    "sky": "NODE_ENV=development DYNAMODB_TABLE=veracode-github-app-sky nodemon ./src/main.js",
     "start": "probot run ./src/index.js",
     "test": "jest"
   },
   "dependencies": {
+    "@aws/dynamodb-data-mapper": "^0.7.3",
     "adm-zip": "^0.5.10",
+    "aws-sdk": "^2.1295.0",
     "fs-extra": "^11.1.0",
+    "js-yaml": "^4.1.0",
     "lodash.pick": "^4.4.0",
-    "mongoose": "^6.8.2",
+    "pluralize": "^8.0.0",
     "probot": "^12.2.4"
   },
   "devDependencies": {
