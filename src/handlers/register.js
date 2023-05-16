@@ -1,47 +1,79 @@
-const { Run } = require('../models/run.model');
-const { github_host } = require('../utils/constants')
-const { enforceProtection } = require('../utils/enforce-protection');
+const { 
+  github_host, 
+  default_organization_repository 
+} = require('../utils/constants');
+const { dbConnect } = require('../db/cosmo-client');
+const Run = require('../models/run');
 
 async function handleRegister (req, res, { app }) {
-  const { id, run_id, name, sha, enforce, enforce_admin, documentation } = req.query
-  const run = await Run.findById(id);
-  if (!run) return res.sendStatus(404);
-  if (run.sha !== sha) return res.sendStatus(404); // Although unlikely, make sure that people can't create checks by submitting random IDs (mongoose IDs are not-so-random)
+  await dbConnect();
+  const { 
+    run_id, 
+    name, 
+    sha, 
+    branch,
+    enforce, 
+    enforce_admin,
+    repository_owner,
+    repository_name,
+    event_type
+  } = req.query
 
   const data = {
-    owner: run.repository.owner,
-    repo: run.repository.name,
-    head_sha: run.sha,
+    owner: repository_owner,
+    repo: repository_name,
+    head_sha: sha,
     name: name,
-    details_url: `${github_host}/${run.repository.owner}/${run.config.workflows_repository}/actions/runs/${run_id}`,
+    details_url: `${github_host}/${repository_owner}/${default_organization_repository}/actions/runs/${run_id}`,
     status: 'in_progress'
   }
 
   let octokit = await app.auth();
   const installation = await octokit.apps.getRepoInstallation({
-    owner: run.repository.owner, 
-    repo: run.repository.name 
+    owner: repository_owner, 
+    repo: repository_name
   })
   octokit = await app.auth(installation.data.id)
 
   const checks_run = await octokit.checks.create(data);
 
-  enforceProtection(
-    octokit,
-    { owner: run.repository.owner, repo: run.repository.name },
-    data.name,
-    enforce === "true",
-    run.repository.name !== run.config.workflows_repository &&
-      enforce_admin === "true" // Exclude the repository that contains the workflow.
-  );
+  //save run to CosmosDB
+  // const runData = {
+  //   run_id: run_id,
+  //   sha: sha,
+  //   repository_owner: repository_owner,
+  //   repository_name: repository_name,
+  //   check_run_id: checks_run.data.id,
+  //   check_run_type: event_type,
+  //   branch: branch
+  // }
 
-  const checkInfo = {
-    name: data.name,
-    run_id: Number(run_id),
-    checks_run_id: checks_run.data.id,
-  };
+  // const Run = database.model('Run', runSchema);
+  // try {
+  //   const database = await db.connect();
+  //   const collection = database.collection('runs');
+  //   const result = await collection.insertOne(runData);
+  //   console.log(
+  //     `documents were inserted with the _id: ${result.insertedId}`,
+  //   );
+  // } catch (error) {
+  //   console.error(error);
+  //   return response.status(500).json({err: 'MongoError'})
+  // }
 
-  await Run.findByIdAndUpdate(id, { $push: { checks: checkInfo } });
+  // const database = await connect();
+
+  // Insert a new document into the database
+  const run = new Run({
+    run_id: run_id,
+    sha: sha,
+    repository_owner: repository_owner,
+    repository_name: repository_name,
+    check_run_id: checks_run.data.id,
+    check_run_type: event_type,
+    branch: branch
+  });
+  await run.save();
 
   return res.sendStatus(200);
 }
