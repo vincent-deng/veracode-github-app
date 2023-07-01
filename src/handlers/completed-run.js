@@ -1,5 +1,4 @@
-const mapper = require('../db/dynamo-client');
-const Run = require('../models/run.model');
+const { getWorkflowRunById } = require('../services/db-services/db-operations');
 const { 
   updateChecksForCompletedSCAScan 
 } = require('../services/completed-run-services/completed-sca-scan');
@@ -16,16 +15,10 @@ async function handleCompletedRun(app, context) {
 
   const workflow_repo_run_id = context.payload.workflow_run.id;
 
-  let run;
-  try {
-    run = await mapper.get(Object.assign(new Run(), { run_id: workflow_repo_run_id }))
-  } catch (error) {
-    app.log.error(error)
-    return;
-  }
+  const run = await getWorkflowRunById(app, workflow_repo_run_id);
 
   if (!run) return
-  console.log(run);
+  app.log.info(run);
 
   if (run.check_run_type.substring(0, 26) === 'veracode-local-compilation') 
     handleCompletedCompilation(run, context);
