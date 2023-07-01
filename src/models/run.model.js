@@ -1,11 +1,11 @@
 const DynamoDbSchema = require('@aws/dynamodb-data-mapper').DynamoDbSchema
 const DynamoDbTable = require("@aws/dynamodb-data-mapper").DynamoDbTable
-const { dynamodb_table } = require('../utils/constants')
+const appConfig = require('../app-config');
 
 class Run {}
 
 Object.defineProperties(Run.prototype, {
-  [DynamoDbTable]: { value: dynamodb_table },
+  [DynamoDbTable]: { value: appConfig().dbName },
   [DynamoDbSchema]: {
     value: {
       run_id: {

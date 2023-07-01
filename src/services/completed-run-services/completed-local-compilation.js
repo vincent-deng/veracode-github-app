@@ -1,5 +1,5 @@
-const { ngrok, default_organization_repository } = require('../../utils/constants');
 const { createDispatchEvent } = require('../dispatch-event-services/dispatch');
+const appConfig = require('../../app-config');
 
 async function handleCompletedCompilation (run, context) {
   const data = {
@@ -30,8 +30,7 @@ async function handleCompletedCompilation (run, context) {
       token: token.data.token,
       sha: run.sha,
       branch: run.branch,
-      callback_url: `${ngrok}/register`,
-      // TODO: read veracode.yml to get profile name
+      callback_url: `${appConfig().appUrl}/register`,
       profile_name: context.payload.repository.full_name, 
       run_id: run.run_id,
       repository: {
@@ -45,7 +44,7 @@ async function handleCompletedCompilation (run, context) {
   const subsequentScanType = run.check_run_type.substring(27);
   const dispatchEvents = [{
     event_type: subsequentScanType,
-    repository: default_organization_repository,
+    repository: appConfig().defaultOrganisationRepository,
     event_trigger: `binary-ready-${subsequentScanType}`
   }]
 

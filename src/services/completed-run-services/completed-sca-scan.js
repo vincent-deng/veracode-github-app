@@ -1,6 +1,3 @@
-// const fs = require("fs-extra");
-// const AdmZip = require("adm-zip");
-// const { artifact_folder } = require('../../utils/constants');
 const { updateChecksForCompletedSastScan } = 
   require('../check-services/update-checks-with-artifact');
 
