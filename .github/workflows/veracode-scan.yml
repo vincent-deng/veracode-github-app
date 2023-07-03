@@ -1,0 +1,34 @@
+name: Veracode SAST and SCA Scan
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at midnight UTC
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v3
+
+      - name: Prepare the SAST scan artifact
+        run: zip -r veracode.zip . -x .git/**\*
+
+      - name: Veracode Upload And Scan
+        uses: veracode/veracode-uploadandscan-action@0.2.6
+        with:
+          appname: 'Veracode GitHub App'
+          createprofile: true
+          filepath: veracode.zip
+          vid: '${{ secrets.VERACODE_API_ID }}'
+          vkey: '${{ secrets.VERACODE_API_KEY }}'
+
+      - name: Run Veracode SCA
+        env:
+          SRCCLR_API_TOKEN: ${{ secrets.SRCCLR_API_TOKEN }}
+        uses: veracode/veracode-sca@v2.1.6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          create-issues: false
