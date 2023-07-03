@@ -13,7 +13,6 @@
   ],
   "scripts": {
     "dev": "NODE_ENV=development nodemon ./src/main.js",
-    "sky": "NODE_ENV=development DYNAMODB_TABLE=veracode-github-app-sky nodemon ./src/main.js",
     "start": "probot run ./src/index.js",
     "test": "jest"
   },
@@ -28,7 +27,7 @@
     "mongodb": "^5.3.0",
     "mongoose": "^7.1.0",
     "pluralize": "^8.0.0",
-    "probot": "^12.2.4"
+    "probot": "^12.3.1"
   },
   "devDependencies": {
     "jest": "^29.0.0",
