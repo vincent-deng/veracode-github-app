@@ -17,7 +17,7 @@ async function getVeracodeConfig(context, sha) {
   return veracodeConfig;
 }
 
-async function getVeracodeConfigFromRepo(octokit, owner, repository) {
+async function getVeracodeConfigFromRepo(app, octokit, owner, repository) {
   let veracodeConfig; 
   try {
     veracodeConfig = await octokit.repos.getContent({
@@ -26,7 +26,7 @@ async function getVeracodeConfigFromRepo(octokit, owner, repository) {
       path: appConfig().veracodeConfigFile,
     });
   } catch (error) {
-    console.log(`${appConfig().veracodeConfigFile} not found`);
+    app.log.info(`${appConfig().veracodeConfigFile} not found`);
     return null;
   }
 
