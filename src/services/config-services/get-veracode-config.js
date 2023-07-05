@@ -1,4 +1,4 @@
-const { veracode_config_file } = require('../../utils/constants');
+const appConfig = require('../../app-config');
 
 async function getVeracodeConfig(context, sha) {
   let veracodeConfig; 
@@ -6,7 +6,7 @@ async function getVeracodeConfig(context, sha) {
     veracodeConfig = await context.octokit.repos.getContent({
       owner: context.payload.repository.owner.login,
       repo: context.payload.repository.name,
-      path: "veracode.yml",
+      path: appConfig().veracodeConfigFile,
       ref: sha
     });
   } catch (error) {
@@ -17,16 +17,16 @@ async function getVeracodeConfig(context, sha) {
   return veracodeConfig;
 }
 
-async function getVeracodeConfigFromRepo(octokit, owner, repository) {
+async function getVeracodeConfigFromRepo(app, octokit, owner, repository) {
   let veracodeConfig; 
   try {
     veracodeConfig = await octokit.repos.getContent({
       owner,
       repo: repository,
-      path: veracode_config_file,
+      path: appConfig().veracodeConfigFile,
     });
   } catch (error) {
-    console.log(`${veracode_config_file} not found`);
+    app.log.info(`${appConfig().veracodeConfigFile} not found`);
     return null;
   }
 

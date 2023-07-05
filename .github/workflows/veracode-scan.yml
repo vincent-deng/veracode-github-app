@@ -1,0 +1,66 @@
+name: Veracode SAST and SCA Scan
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at midnight UTC
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v3
+
+      - name: Prepare the SAST scan artifact
+        run: zip -r veracode.zip . -x .git/**\* test/**\* .github/**\* .gitignore .gitattributes
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: veracode-artifact
+          path: veracode.zip
+
+  veracode_policy_scan:
+    needs: build
+    runs-on: ubuntu-latest
+    name: Veracode Static Code Analysis
+    steps:
+      - name: get archive
+        uses: actions/download-artifact@v3
+        with:
+          name: veracode-artifact
+          path: ./veracode_artifact_directory
+
+      - name: Get the name of the downloaded files
+        run: |
+          artifact_file=$(ls -1 ./veracode_artifact_directory | head -n 1)
+          echo "veracode_artifact=$artifact_file" >> $GITHUB_ENV
+
+      - name: Veracode Upload And Scan
+        uses: veracode/veracode-uploadandscan-action@0.2.6
+        with:
+          appname: 'Veracode GitHub App'
+          createprofile: true
+          version: '${{ github.run_id }}'
+          filepath: ./veracode_artifact_directory/${{ env.veracode_artifact }}
+          vid: '${{ secrets.VERACODE_API_ID }}'
+          vkey: '${{ secrets.VERACODE_API_KEY }}'
+          scanpollinginterval: 30
+          scantimeout: 15
+
+  veracode-sca-scan:
+    runs-on: ubuntu-latest
+    name: Veracode Component Analysis
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v3
+
+      - name: Run Veracode SCA
+        env:
+          SRCCLR_API_TOKEN: ${{ secrets.SRCCLR_API_TOKEN }}
+        uses: veracode/veracode-sca@v2.1.6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          create-issues: false

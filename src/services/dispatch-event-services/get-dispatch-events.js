@@ -17,11 +17,11 @@ async function getDispatchEvents(app, context, branch) {
   let veracodeScanConfigs;
   // 1. get veracode.yml from original repository
   let veracodeConfigFromRepo = await getVeracodeConfigFromRepo(
-    octokit, owner, originalRepo);
+    app, octokit, owner, originalRepo);
   // 2. if veracode.yml does not exist in original repository, get veracode.yml from default organization repository
   if (veracodeConfigFromRepo === null) 
     veracodeConfigFromRepo = await getVeracodeConfigFromRepo(
-      octokit, owner, default_organization_repository);
+      app, octokit, owner, default_organization_repository);
 
   if (veracodeConfigFromRepo === null) {
     try {
