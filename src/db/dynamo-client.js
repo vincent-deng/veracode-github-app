@@ -9,7 +9,7 @@ if (process.env.NODE_ENV === 'development') {
   config.accessKey = process.env.FOOBAR
   config.secretAccessKey = process.env.DB_SECRETACCESSKEY
 } else {
-  config.region = 'ap-southeast-2'
+  config.region = process.env.DB_REGION
   config.accessKey = ''
   config.secretAccessKey = ''
 }
