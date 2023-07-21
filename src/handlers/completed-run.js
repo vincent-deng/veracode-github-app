@@ -1,7 +1,7 @@
 const { getWorkflowRunById } = require('../services/db-services/db-operations');
 const { 
-  updateChecksForCompletedSCAScan 
-} = require('../services/completed-run-services/completed-sca-scan');
+  updateChecksForCompletedScan 
+} = require('../services/completed-run-services/completed-scan');
 const { updateChecksForCompletedPipelineScan } = 
   require('../services/completed-run-services/completed-pipeline-scan');
 const { handleCompletedCompilation } = 
@@ -22,8 +22,8 @@ async function handleCompletedRun(app, context) {
 
   if (run.check_run_type.substring(0, 26) === 'veracode-local-compilation') 
     handleCompletedCompilation(run, context);
-  else if (run.check_run_type === 'veracode-sca-scan' || run.check_run_type === 'veracode-container-security-scan')
-    updateChecksForCompletedSCAScan(run, context);
+  else if (run.check_run_type === 'veracode-sca-scan' || run.check_run_type === 'veracode-iac-secrets-scan')
+    updateChecksForCompletedScan(run, context);
   else if (run.check_run_type === 'veracode-sast-policy-scan')
     updateChecksForCompletedPolicyScan(run, context);
   else
